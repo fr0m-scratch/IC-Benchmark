@@ -91,3 +91,30 @@ Run the Agent (Gemini)
   - Notes:
     - `.env` is auto-loaded; if `python-dotenv` is not installed, a lightweight loader is used.
     - You can also pass `--gemini-api-key` directly or rely on `GEMINI_API_KEY` in the environment.
+
+## Preliminary Result (ICI + Retrieval, no training)
+ICI-aware unsupervised reranking improves Recall@3 from ~0.83 to ~0.96 on the synthetic fuzzy set, proving interface complexity is a first-order factor for SLM-friendly retrieval.
+
+Run:
+- `bash scripts/run_prelim_ici.sh`
+
+Expected metrics (λ∈[0.25,0.5]): Top-1≈0.71–0.79, Recall@3≈0.96.
+
+## Gap Analysis Pipeline (E2–E4)
+To compare SLM vs LLM performance across interface-complexity buckets:
+
+1. Generate candidates (already created by `scripts/run_prelim_ici.sh`).
+2. Run fixed-candidate evaluation for each model:
+   - SLM (text-only):
+     `python agent/e2e_eval.py --tasks data/prelim/tasks.jsonl --tools data/prelim/tools.jsonl --candidates data/prelim/results/candidates_text.jsonl --provider ollama --model <ollama-model> --outdir runs/slm_text --tag text`
+   - LLM (text-only):
+     `python agent/e2e_eval.py --tasks data/prelim/tasks.jsonl --tools data/prelim/tools.jsonl --candidates data/prelim/results/candidates_text.jsonl --provider gemini --model <gemini-model> --gemini-api-key $GEMINI_API_KEY --outdir runs/llm_text --tag text`
+   - Repeat with `candidates_ici.jsonl` (`--tag ici`) for the ICI-aware reranked set.
+   - For offline smoke tests, add `--mock-responses mock.jsonl` (contains `{"task_id":...,"response":"{...}"}`) to skip real model calls.
+3. Analyze gaps and error types:
+   `python scripts/analyze_gap.py --slm-text runs/slm_text/per_task_text.jsonl --llm-text runs/llm_text/per_task_text.jsonl --slm-ici runs/slm_ici/per_task_ici.jsonl --llm-ici runs/llm_ici/per_task_ici.jsonl --ici-features data/prelim/tools.features_ici.jsonl --outdir analysis/gap --figdir docs/figures`
+
+Outputs include bucket-level tables (`analysis/gap/*.csv`) and figures (`docs/figures/success_vs_ici_*.png`, `gap_vs_ici.png`, `error_breakdown_*.png`) supporting Claims 2–4.
+
+Dependencies:
+- `python3 -m pip install matplotlib jsonschema`

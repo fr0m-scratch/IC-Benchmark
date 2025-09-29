@@ -1,0 +1,24 @@
+{"task_id":"tickets-raw-1","query":"Create a severity P1 ticket with routing instructions and cc three responders.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"tickets-raw-2","query":"Open a compliance ticket using the raw API, include SEV-B priority and slack contact.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"tickets-raw-3","query":"Submit a facilities outage ticket with metadata labels and cc list via the raw endpoint.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"tickets-raw-4","query":"Log a dev escalation with P3 severity, routing site EU-LON1, and cc on-call.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"tickets-raw-5","query":"File a legal incident ticket that captures attachments and routing urgency 9.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"tickets-raw-6","query":"Register a security breach ticket requiring phone contact and meta labels.","gold_tool_id":"tickets.create_raw"}
+{"task_id":"calendar-raw-1","query":"Create a recurring board meeting with RRULE weekly on Friday and Zoom conferencing.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"calendar-raw-2","query":"Update calendar event resources and guest policy while providing alternative epoch timing.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"calendar-raw-3","query":"Schedule an offsite block with resource booking, attendee list, and custom time zone.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"calendar-raw-4","query":"Mutate an event to add RRULE and forbid guests from inviting others.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"calendar-raw-5","query":"Create a video conference with Teams provider and recurrence using the raw mutation API.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"calendar-raw-6","query":"Set an alternative start_local schedule for a training session with resources.","gold_tool_id":"calendar.events_mutate"}
+{"task_id":"search-adv-1","query":"Search the document index with must/should filters and score threshold using the advanced API.","gold_tool_id":"search.index_advanced"}
+{"task_id":"search-adv-2","query":"Run a faceted search targeting author boosts and post-filter character minimums.","gold_tool_id":"search.index_advanced"}
+{"task_id":"search-adv-3","query":"Query the index with advanced filters (must+not) and boosted title field.","gold_tool_id":"search.index_advanced"}
+{"task_id":"search-adv-4","query":"Perform knowledge search requiring post_filter score threshold 45 via raw index tool.","gold_tool_id":"search.index_advanced"}
+{"task_id":"search-adv-5","query":"Execute an indexed search with should clauses and author boost 6.","gold_tool_id":"search.index_advanced"}
+{"task_id":"search-adv-6","query":"Launch an advanced index lookup enabling facets and boost on body field.","gold_tool_id":"search.index_advanced"}
+{"task_id":"storage-raw-1","query":"Upload to bucket corp-data with raw object API, set content_type text/plain and team metadata.","gold_tool_id":"storage.put_object_raw"}
+{"task_id":"storage-raw-2","query":"Store a file with encryption SSE-KMS and custom metadata tags.","gold_tool_id":"storage.put_object_raw"}
+{"task_id":"storage-raw-3","query":"Push object to S3 bucket using raw API with gzip encoding and tags.","gold_tool_id":"storage.put_object_raw"}
+{"task_id":"storage-raw-4","query":"Create a raw object upload with SSE-S3 mode and provided origin metadata.","gold_tool_id":"storage.put_object_raw"}
+{"task_id":"storage-raw-5","query":"Write an object specifying content_type application/json and key without spaces.","gold_tool_id":"storage.put_object_raw"}
+{"task_id":"storage-raw-6","query":"Put object with kms_key reference and context using the advanced storage API.","gold_tool_id":"storage.put_object_raw"}

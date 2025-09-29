@@ -1,0 +1,24 @@
+{"task_id":"tickets-1","query":"File a quick helpdesk ticket with a short title and a basic priority.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"tickets-2","query":"Open a support request urgently with a brief subject.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"tickets-3","query":"Report an IT problem—just a title and how important it is.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"tickets-4","query":"Create a simple ticket for HR with high importance.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"tickets-5","query":"Log a facilities issue at medium priority, keep it short.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"tickets-6","query":"Start a helpdesk case fast—no extra metadata.","gold_tool_id":"tickets.create_simple"}
+{"task_id":"calendar-1","query":"Set up a quick meeting for tomorrow 10am for 30 minutes with two colleagues.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"calendar-2","query":"Schedule a short sync next Monday afternoon with the team.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"calendar-3","query":"Book a call at 9:30 for 45 minutes with alice and bob.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"calendar-4","query":"Arrange a brief meeting later today, keep details minimal.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"calendar-5","query":"Create a 20-min update chat with three participants.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"calendar-6","query":"Schedule a quick catch-up with default settings.","gold_tool_id":"calendar.schedule_simple"}
+{"task_id":"search-1","query":"Look up docs about incident response runbooks.","gold_tool_id":"search.docs_simple"}
+{"task_id":"search-2","query":"Search the knowledge base for API rate limiting guidelines.","gold_tool_id":"search.docs_simple"}
+{"task_id":"search-3","query":"Find documentation on OAuth token refresh steps.","gold_tool_id":"search.docs_simple"}
+{"task_id":"search-4","query":"Locate papers discussing vector databases overview.","gold_tool_id":"search.docs_simple"}
+{"task_id":"search-5","query":"Retrieve notes on quarterly planning templates.","gold_tool_id":"search.docs_simple"}
+{"task_id":"search-6","query":"Search docs for onboarding checklist.","gold_tool_id":"search.docs_simple"}
+{"task_id":"storage-1","query":"Upload a local file and make it team visible.","gold_tool_id":"storage.upload_simple"}
+{"task_id":"storage-2","query":"Put this report online quickly, keep it private by default.","gold_tool_id":"storage.upload_simple"}
+{"task_id":"storage-3","query":"Send the PDF to storage and share with the team.","gold_tool_id":"storage.upload_simple"}
+{"task_id":"storage-4","query":"Upload a spreadsheet with public access.","gold_tool_id":"storage.upload_simple"}
+{"task_id":"storage-5","query":"Store a log file; I only have the path handy.","gold_tool_id":"storage.upload_simple"}
+{"task_id":"storage-6","query":"Upload a document; visibility can be public.","gold_tool_id":"storage.upload_simple"}

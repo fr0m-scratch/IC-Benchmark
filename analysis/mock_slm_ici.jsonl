@@ -1,0 +1,24 @@
+{"task_id": "tickets-1", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "tickets-2", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "tickets-3", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "tickets-4", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "tickets-5", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "tickets-6", "response": "{\"tool_id\": \"tickets.create_simple\", \"arguments\": {\"title\": \"Example issue\", \"priority\": \"medium\"}}"}
+{"task_id": "calendar-1", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "calendar-2", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "calendar-3", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "calendar-4", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "calendar-5", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "calendar-6", "response": "{\"tool_id\": \"calendar.schedule_simple\", \"arguments\": {\"start_time\": \"2024-07-01T10:00:00Z\", \"duration_minutes\": 30, \"participants\": [\"a@example.com\"], \"title\": \"Sync\"}}"}
+{"task_id": "search-1", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "search-2", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "search-3", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "search-4", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "search-5", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "search-6", "response": "{\"tool_id\": \"search.docs_simple\", \"arguments\": {\"query\": \"sample\", \"top_k\": 5}}"}
+{"task_id": "storage-1", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}
+{"task_id": "storage-2", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}
+{"task_id": "storage-3", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}
+{"task_id": "storage-4", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}
+{"task_id": "storage-5", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}
+{"task_id": "storage-6", "response": "{\"tool_id\": \"storage.upload_simple\", \"arguments\": {\"path\": \"./file.txt\", \"visibility\": \"team\"}}"}

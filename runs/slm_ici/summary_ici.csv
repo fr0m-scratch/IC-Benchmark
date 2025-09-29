@@ -1,0 +1,6 @@
+metric,value
+tasks,24
+selection_accuracy,1.000
+json_valid_rate,0.958
+schema_valid_rate,0.958
+pass@1,0.958

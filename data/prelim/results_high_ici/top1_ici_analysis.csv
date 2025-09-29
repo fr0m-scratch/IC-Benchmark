@@ -1,0 +1,3 @@
+lambda,mode,Top1_acc,Top1_mean_ICI,Top1_right_ICI,Top1_wrong_ICI
+0.0,text,0.917,0.625,0.714,-0.353
+0.25,ici,0.375,-0.352,0.372,-0.787

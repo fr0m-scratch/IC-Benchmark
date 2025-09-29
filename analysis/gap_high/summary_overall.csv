@@ -1,0 +1,5 @@
+run,pass@1,selection_accuracy,json_valid_rate
+slm_text,0.583,1.0,0.583
+llm_text,0.042,0.042,0.042
+slm_ici,0.417,0.875,0.5
+llm_ici,0.042,0.042,0.042
