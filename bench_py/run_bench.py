@@ -23,6 +23,24 @@ import http.client
 
 from bench_py.agent_executor import AgentConfig, AgentExecutor
 
+# Load .env support (lightweight fallback if python-dotenv is unavailable)
+try:
+    from dotenv import load_dotenv  # type: ignore
+except Exception:  # pragma: no cover
+    def load_dotenv(path: str = '.env'):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    s = line.strip()
+                    if not s or s.startswith('#'):
+                        continue
+                    if '=' in s:
+                        k, v = s.split('=', 1)
+                        k = k.strip(); v = v.strip().strip('"').strip("'")
+                        os.environ.setdefault(k, v)
+        except FileNotFoundError:
+            pass
+
 
 def wait_for_health(server_url: str, timeout_s: int = 10) -> bool:
     u = urlparse(server_url)
@@ -114,6 +132,9 @@ def run_suite(server_url: str, tasks: List[Dict[str, Any]], provider: str, model
 
 
 def main() -> None:
+    # Load .env so GEMINI_API_KEY is visible to defaults and runtime
+    load_dotenv()
+
     ap = argparse.ArgumentParser()
     ap.add_argument('--port', type=int, default=3015)
     ap.add_argument('--tools', type=str, default='bench/tools.advanced.jsonl')
@@ -125,7 +146,7 @@ def main() -> None:
     ap.add_argument('--ollama-model', type=str, default='qwen2.5:7b-instruct')
     ap.add_argument('--ollama-url', type=str, default='http://localhost:11434')
     ap.add_argument('--gemini-model', type=str, default='gemini-2.5-flash')
-    ap.add_argument('--gemini-api-key', type=str, default=os.environ.get('GEMINI_API_KEY'))
+    ap.add_argument('--gemini-api-key', type=str, default=None)
     ns = ap.parse_args()
 
     server_url = f"http://localhost:{ns.port}"
@@ -158,9 +179,10 @@ def main() -> None:
             print('Ollama not reachable; skipping.')
 
         # Gemini
-        if ns.gemini_api_key:
+        gemini_key = ns.gemini_api_key or os.environ.get('GEMINI_API_KEY')
+        if gemini_key:
             print(f"Running suite with Gemini model={ns.gemini_model}")
-            results.append(run_suite(server_url, tasks, 'gemini', ns.gemini_model, ns.ollama_url, ns.gemini_api_key, ns.limit, ns.max_steps, ns.retry))
+            results.append(run_suite(server_url, tasks, 'gemini', ns.gemini_model, ns.ollama_url, gemini_key, ns.limit, ns.max_steps, ns.retry))
         else:
             print('GEMINI_API_KEY not provided; skipping Gemini.')
 
@@ -177,4 +199,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-
