@@ -1,0 +1,2 @@
+{"id":"t1","prompt":"Add 2 and 3.","expect":{"tool":"adder","output":{"sum":5}},"notes":"Should call adder and compute 5"}
+{"id":"t2","prompt":"Echo the message hello.","expect":{"tool":"sleep_echo","output":{"message":"hello"}},"notes":"Should call sleep_echo and return message echo"}
