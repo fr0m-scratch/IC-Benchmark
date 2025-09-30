@@ -1,7 +1,0 @@
-Metric,Text-only,ICI-penalized (λ=0.5)
-Top-1,0.708,0.542
-Recall@3,0.833,0.917
-Recall@5,1.0,1.0
-C@3,0.278,0.306
-C@5,0.2,0.2
-nDCG@10,0.852,0.798
