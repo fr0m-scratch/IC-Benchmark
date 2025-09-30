@@ -1,5 +1,0 @@
-run,pass@1,selection_accuracy,json_valid_rate
-slm_text,0.917,1.0,0.917
-llm_text,0.5,0.5,0.5
-slm_ici,0.958,1.0,0.958
-llm_ici,0.5,0.5,0.5

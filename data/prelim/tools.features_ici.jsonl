@@ -1,8 +1,0 @@
-{"tool_id": "tickets.create_simple", "num_params": 2, "num_required": 2, "depth": 1, "branching": 0, "enum_cnt": 1, "enum_avg": 3.0, "constraints": 0, "desc_tokens": 20, "name_readability": 0.0}
-{"tool_id": "tickets.create_raw", "num_params": 14, "num_required": 7, "depth": 3, "branching": 5, "enum_cnt": 2, "enum_avg": 9.5, "constraints": 12, "desc_tokens": 29, "name_readability": 0.03571428571428571}
-{"tool_id": "calendar.schedule_simple", "num_params": 4, "num_required": 3, "depth": 2, "branching": 0, "enum_cnt": 0, "enum_avg": 0.0, "constraints": 6, "desc_tokens": 19, "name_readability": 0.5}
-{"tool_id": "calendar.events_mutate", "num_params": 19, "num_required": 6, "depth": 3, "branching": 2, "enum_cnt": 1, "enum_avg": 7.0, "constraints": 13, "desc_tokens": 28, "name_readability": 0.42105263157894735}
-{"tool_id": "search.docs_simple", "num_params": 2, "num_required": 1, "depth": 1, "branching": 0, "enum_cnt": 0, "enum_avg": 0.0, "constraints": 2, "desc_tokens": 17, "name_readability": 0.5}
-{"tool_id": "search.index_advanced", "num_params": 13, "num_required": 1, "depth": 3, "branching": 0, "enum_cnt": 0, "enum_avg": 0.0, "constraints": 10, "desc_tokens": 25, "name_readability": 0.2692307692307692}
-{"tool_id": "storage.upload_simple", "num_params": 2, "num_required": 1, "depth": 1, "branching": 0, "enum_cnt": 1, "enum_avg": 3.0, "constraints": 0, "desc_tokens": 12, "name_readability": 0.0}
-{"tool_id": "storage.put_object_raw", "num_params": 11, "num_required": 2, "depth": 3, "branching": 2, "enum_cnt": 2, "enum_avg": 7.5, "constraints": 4, "desc_tokens": 25, "name_readability": 0.2727272727272727}
