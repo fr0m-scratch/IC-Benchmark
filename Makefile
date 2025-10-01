@@ -3,7 +3,7 @@ PYTHON ?= python3
 .PHONY: tasks e2e bench report server tests
 
 server:
-	$(PYTHON) server_py/app.py --port 3001 --tools tools.jsonl
+	$(PYTHON) server/app.py --port 3001 --tools tools.jsonl
 
 tasks:
 	PYTHONPATH=. $(PYTHON) bench/taskgen.py --tools tools.jsonl --generic-out tests/tasks/generic_tasks.jsonl --fuzzy-out tests/tasks/fuzzy_tasks.jsonl --tiers realistic --seed 42

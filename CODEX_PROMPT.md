@@ -51,12 +51,12 @@ Ship a production-quality, reproducible E2E system that:
 - [ ] Prompts in `prompts/` (system + tool-use + slot-filling templates).
 
 ### D) Server upgrades
-- [ ] `server_py/app.py`:
+- [ ] `server/app.py`:
   - Validate request against `input_schema`, optionally against `output_schema`.
   - Add toggles: **complexity wrappers** (flat-easy vs original vs hard) per tool.
   - Add pagination/rate-limit/auth simulators (to model `IC_server`).
   - Hot-reload tools JSONL by mtime (already noted) and emit `x-ic-tool` headers with current scores.
-- [ ] `server_py/ic_wrap.py`: wrappers to project complex schemas into simpler “narrow” forms (defaults/examples filled, optional two-step).
+- [ ] `server/ic_wrap.py`: wrappers to project complex schemas into simpler “narrow” forms (defaults/examples filled, optional two-step).
 
 ### E) Runners & Reports
 - [ ] `bench/run_e2e.py`: spins server + runs offline tool validation + agent over tasks + aggregates metrics.
@@ -83,7 +83,7 @@ Ship a production-quality, reproducible E2E system that:
 ## Commands (expected to work)
 See `docs/RUNBOOK.md`. Smoke:
 ```bash
-python3 server_py/app.py --port 3001 --tools bench/tools.advanced.jsonl
+python3 server/app.py --port 3001 --tools bench/tools.advanced.jsonl
 PYTHONPATH=. python3 bench/agent.py --model qwen2.5:7b-instruct \
   --server http://localhost:3001 --ollama http://localhost:11434 \
   --prompt "Add 2 and 3." --max-steps 3 --retry 1

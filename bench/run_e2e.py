@@ -51,7 +51,7 @@ def build_experiment_config(data: Dict[str, Any]) -> ExperimentConfig:
     launch = server.get("launch", False)
     server_cmd = server.get("cmd")
     if launch and not server_cmd:
-        base_cmd = [sys.executable, str((Path(__file__).resolve().parents[1] / "server_py" / "app.py"))]
+        base_cmd = [sys.executable, str((Path(__file__).resolve().parents[1] / "server" / "app.py"))]
         if "port" in server:
             base_cmd.extend(["--port", str(server["port"])])
         if "tools_path" in server:

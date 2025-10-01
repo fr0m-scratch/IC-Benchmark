@@ -4,7 +4,7 @@
 - **IC Scorer (`analysis/`)**: loads tool catalogues, extracts schema features, and emits tool/server/set complexity scores with JSON contracts.
 - **Task Generator (`bench/taskgen.py`)**: mines dependencies, samples schema-conforming arguments, and emits both generic and fuzzy task suites.
 - **Agent Core (`bench/agent_executor.py`)**: executes the plan → retrieve → gate → select → fill → invoke → repair loop with complexity-aware thresholds and rich telemetry.
-- **Server (`server_py/app.py`)**: HTTP MCP façade with schema validation, IC-driven wrappers, auth/pagination/rate-limit simulators, and `X-IC-Tool` headers.
+- **Server (`server/app.py`)**: HTTP MCP façade with schema validation, IC-driven wrappers, auth/pagination/rate-limit simulators, and `X-IC-Tool` headers.
 - **Runners (`bench/run_e2e.py`, `bench/run_bench.py`)**: orchestrate end-to-end evaluations, grid sweeps, and logging.
 - **Reporting (`bench/report.py`)**: aggregates per-run summaries into CSV/Markdown artefacts.
 

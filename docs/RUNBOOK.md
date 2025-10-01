@@ -33,7 +33,7 @@
 ## Server Controls
 - Launch manually:
   ```bash
-  python server_py/app.py --port 3001 --tools tools.jsonl --wrap flat --validate-output
+  python server/app.py --port 3001 --tools tools.jsonl --wrap flat --validate-output
   ```
 - Flags:
   - `--wrap {none,flat,hard}` to switch schema variants.

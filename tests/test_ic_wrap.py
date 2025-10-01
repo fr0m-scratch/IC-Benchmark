@@ -5,7 +5,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from server_py.ic_wrap import describe_wrapper_modes, wrap_schema
+from server.ic_wrap import describe_wrapper_modes, wrap_schema
 
 
 SCHEMA = {

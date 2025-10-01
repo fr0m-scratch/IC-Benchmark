@@ -1,312 +1,471 @@
 #!/usr/bin/env python3
-"""
-Python streamable HTTP MCP-like server
+"""HTTP server with interface complexity controls."""
+from __future__ import annotations
 
-Endpoints:
-- GET /health -> { ok: true }
-- GET /tools?limit=&names= -> list tools (JSON or NDJSON if Accept: application/x-ndjson)
-- POST /invoke?stream=1 -> streams NDJSON events; else returns single JSON result
-  Body: { "tool": str, "input": object, "latency_ms"?: int }
-
-Tools JSONL format per line (flexible keys; normalized to {name, description, input_schema, output_schema?, latency_ms?}):
-{
-  "tool_name": "adder",
-  "tool_description": "Add two numbers",
-  "input_schema": {...},
-  "output_schema": {...},
-  "latency_ms": 0
-}
-
-Latency defaults to 0 unless overridden by request or tool definition or --default-latency.
-"""
-
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse, parse_qs
 import argparse
 import json
 import os
+import threading
 import time
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import parse_qs, urlparse
+
+from jsonschema import ValidationError, validate
+
+from analysis.ic_score import ToolRecord, score_tool
+from server.ic_wrap import describe_wrapper_modes, wrap_schema
 
 
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser()
-    p.add_argument('--port', type=int, default=int(os.environ.get('PORT', '3000')))
-    p.add_argument('--tools', type=str, default=os.environ.get('TOOLS_PATH', 'bench/tools.sample.jsonl'))
-    p.add_argument('--default-latency', type=int, default=int(os.environ.get('DEFAULT_LATENCY', '0')))
-    return p.parse_args()
+@dataclass
+class ToolEntry:
+    name: str
+    description: str
+    input_schema: Dict[str, Any]
+    output_schema: Optional[Dict[str, Any]]
+    latency_ms: Optional[int]
+    raw: Dict[str, Any]
+    server_id: str
+    ic_score: float
+    schema_variants: Dict[str, Dict[str, Any]]
 
-
-def normalize_tool(obj: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    name = obj.get('tool_name') or obj.get('name') or obj.get('id') or obj.get('tool') or obj.get('title')
-    desc = obj.get('tool_description') or obj.get('description') or ''
-    input_schema = obj.get('input_schema') or obj.get('inputSchema') or obj.get('schema')
-    output_schema = obj.get('output_schema') or obj.get('outputSchema')
-    latency_ms = obj.get('latency_ms')
-    if not name or not input_schema:
-        return None
-    return {
-        'name': name,
-        'description': desc,
-        'input_schema': input_schema,
-        'output_schema': output_schema,
-        'latency_ms': latency_ms if isinstance(latency_ms, int) else None,
-    }
+    def as_payload(self, wrap_mode: str) -> Dict[str, Any]:
+        schema = self.schema_variants.get(wrap_mode, self.input_schema)
+        payload = {
+            "name": self.name,
+            "description": self.description,
+            "input_schema": schema,
+            "latency_ms": self.latency_ms,
+            "server_id": self.server_id,
+            "ic_tool": self.ic_score,
+        }
+        if self.output_schema:
+            payload["output_schema"] = self.output_schema
+        payload.update({k: v for k, v in self.raw.items() if k not in payload})
+        return payload
 
 
 class ToolsStore:
-    def __init__(self, path: str):
+    def __init__(self, path: str, wrap_mode: str):
         self.path = path
+        self.wrap_mode = wrap_mode
         self.mtime = 0.0
-        self.map: Dict[str, Dict[str, Any]] = {}
+        self.tools: Dict[str, ToolEntry] = {}
+        self.lock = threading.RLock()
 
-    def load(self, names_filter: Optional[List[str]] = None) -> Dict[str, Dict[str, Any]]:
+    def load(self, names_filter: Optional[List[str]] = None) -> Dict[str, ToolEntry]:
         names_filter = names_filter or []
-        try:
-            st = os.stat(self.path)
-        except FileNotFoundError:
-            return self.map
-        if st.st_mtime == self.mtime and self.map:
-            # cached
+        with self.lock:
+            try:
+                stat = os.stat(self.path)
+            except FileNotFoundError:
+                return {}
+            reload_needed = stat.st_mtime != self.mtime or not self.tools
+            if reload_needed:
+                self.tools = self._load_all()
+                self.mtime = stat.st_mtime
             if names_filter:
-                return {k: v for k, v in self.map.items() if k in names_filter}
-            return self.map
-        # reload
-        new_map: Dict[str, Dict[str, Any]] = {}
+                return {name: entry for name, entry in self.tools.items() if name in names_filter}
+            return dict(self.tools)
+
+    def _load_all(self) -> Dict[str, ToolEntry]:
+        tools: Dict[str, ToolEntry] = {}
         try:
-            with open(self.path, 'r', encoding='utf-8') as f:
-                for line in f:
+            with open(self.path, "r", encoding="utf-8") as handle:
+                for line in handle:
                     line = line.strip()
                     if not line:
                         continue
                     try:
-                        obj = json.loads(line)
-                        t = normalize_tool(obj)
-                        if not t:
-                            continue
-                        if names_filter and t['name'] not in names_filter:
-                            continue
-                        if t['name'] not in new_map:
-                            new_map[t['name']] = t
-                    except Exception:
-                        # skip malformed line
-                        pass
-        except Exception:
-            # leave empty if read fails
-            new_map = {}
-        self.mtime = st.st_mtime
-        self.map = new_map
-        return self.map
+                        raw = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    entry = self._normalise_tool(raw)
+                    if not entry:
+                        continue
+                    tools[entry.name] = entry
+        except FileNotFoundError:
+            return {}
+        return tools
 
-
-def placeholder_from_schema(schema: Any, input_obj: Any) -> Any:
-    if not isinstance(schema, dict):
-        return {'echo': input_obj}
-    t = schema.get('type')
-    # handle union types like ["string","null"] by preferring null, else first
-    if isinstance(t, list):
-        if 'null' in t:
+    def _normalise_tool(self, raw: Dict[str, Any]) -> Optional[ToolEntry]:
+        name = raw.get("tool_name") or raw.get("name") or raw.get("id")
+        if not name:
             return None
-        t = t[0] if t else None
-    if t == 'object':
-        out: Dict[str, Any] = {}
-        props = schema.get('properties') or {}
-        if isinstance(props, dict):
-            for k, v in props.items():
-                out[k] = placeholder_from_schema(v, None)
-        out['echo'] = input_obj
-        return out
-    if t == 'array':
-        return []
-    if t == 'string':
-        return ''
-    if t in ('number', 'integer'):
-        return 0
-    if t == 'boolean':
-        return False
-    return {'echo': input_obj}
+        description = raw.get("tool_description") or raw.get("description") or ""
+        input_schema = raw.get("input_schema") or raw.get("inputSchema")
+        if not isinstance(input_schema, dict):
+            return None
+        output_schema = raw.get("output_schema") if isinstance(raw.get("output_schema"), dict) else None
+        latency = raw.get("latency_ms") if isinstance(raw.get("latency_ms"), int) else None
+        server_id = str(raw.get("server_id") or raw.get("serverId") or raw.get("server") or "unknown")
+        tool_id = raw.get("tool_id") or f"{server_id}::{name}"
+        record = ToolRecord(
+            tool_id=str(tool_id),
+            name=str(name),
+            description=str(description),
+            input_schema=input_schema,
+            output_schema=output_schema,
+            server_id=server_id,
+            server_name=server_id,
+            raw=raw,
+        )
+        ic_result = score_tool(record)
+        schema_variants = {
+            mode: wrap_schema(input_schema, mode)
+            for mode in describe_wrapper_modes().keys()
+        }
+        return ToolEntry(
+            name=str(name),
+            description=str(description),
+            input_schema=input_schema,
+            output_schema=output_schema,
+            latency_ms=latency,
+            raw=raw,
+            server_id=server_id,
+            ic_score=ic_result.score,
+            schema_variants=schema_variants,
+        )
+
+    def get(self, tool_name: str) -> Optional[ToolEntry]:
+        with self.lock:
+            return self.tools.get(tool_name)
 
 
-def validate_input(input_obj: Any, schema: Any) -> Optional[str]:
-    """Very basic validation: required fields and primitive type checks."""
-    if not isinstance(schema, dict):
-        return None
-    required = schema.get('required') or []
-    props = schema.get('properties') or {}
-    if not isinstance(input_obj, dict):
-        return 'input_must_be_object'
-    for key in required:
-        if key not in input_obj:
-            return f'missing_required:{key}'
-    # primitive type checks
-    for k, v in input_obj.items():
-        ps = props.get(k) if isinstance(props, dict) else None
-        if ps and 'type' in ps:
-            t = ps['type']
-            if t == 'string' and not isinstance(v, str):
-                return f'type_error:{k}:expected_string'
-            if t in ('number', 'integer') and not isinstance(v, (int, float)):
-                return f'type_error:{k}:expected_number'
-            if t == 'boolean' and not isinstance(v, bool):
-                return f'type_error:{k}:expected_boolean'
-            if t == 'object' and not isinstance(v, dict):
-                return f'type_error:{k}:expected_object'
-            if t == 'array' and not isinstance(v, list):
-                return f'type_error:{k}:expected_array'
-    return None
+class RateLimiter:
+    def __init__(self, max_calls: int, interval: float = 60.0):
+        self.max_calls = max_calls
+        self.interval = interval
+        self.calls: List[float] = []
+        self.lock = threading.Lock()
+
+    def allow(self) -> bool:
+        if self.max_calls <= 0:
+            return True
+        now = time.monotonic()
+        with self.lock:
+            self.calls = [ts for ts in self.calls if now - ts <= self.interval]
+            if len(self.calls) >= self.max_calls:
+                return False
+            self.calls.append(now)
+            return True
 
 
-def simulate_events(tool: str, input_obj: Any, tool_def: Dict[str, Any], latency_ms: int) -> List[Dict[str, Any]]:
-    now = int(time.time() * 1000)
-    events: List[Dict[str, Any]] = []
-    events.append({'event': 'start', 'tool': tool, 'ts': now})
-    total = max(0, int(latency_ms))
-    if total > 0:
-        events.append({'event': 'progress', 'tool': tool, 'message': 'working', 'ts': now + total // 2})
-    # Validate input
-    err = validate_input(input_obj, tool_def.get('input_schema'))
-    if err:
-        events.append({'event': 'error', 'tool': tool, 'error': {'code': 'invalid_input', 'message': err}, 'ts': now + total})
-        events.append({'event': 'end', 'tool': tool, 'ts': now + total})
-        return events
+@dataclass
+class ServerConfig:
+    port: int
+    tools_path: str
+    default_latency: int
+    wrap_mode: str
+    validate_output: bool
+    require_auth: bool
+    auth_key: Optional[str]
+    rate_limit: int
+    paginate: bool
+    page_size: int
 
-    # Schema-derived placeholder output
-    output_schema = tool_def.get('output_schema')
-    output = placeholder_from_schema(output_schema, input_obj)
-    events.append({'event': 'result', 'tool': tool, 'output': output, 'ts': now + total})
-    events.append({'event': 'end', 'tool': tool, 'ts': now + total})
-    return events
+
+def parse_args() -> ServerConfig:
+    parser = argparse.ArgumentParser(description="MCP-like server with complexity controls")
+    parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "3001")))
+    parser.add_argument("--tools", type=str, required=True)
+    parser.add_argument("--default-latency", type=int, default=int(os.environ.get("DEFAULT_LATENCY", "0")))
+    parser.add_argument("--wrap", choices=list(describe_wrapper_modes().keys()), default="none")
+    parser.add_argument("--validate-output", action="store_true")
+    parser.add_argument("--require-auth", action="store_true")
+    parser.add_argument("--auth-key", type=str)
+    parser.add_argument("--rate-limit", type=int, default=0, help="Maximum invoke calls per 60s (0 disables)")
+    parser.add_argument("--paginate", action="store_true", help="Simulate pagination on /tools")
+    parser.add_argument("--page-size", type=int, default=10)
+    args = parser.parse_args()
+    return ServerConfig(
+        port=args.port,
+        tools_path=args.tools,
+        default_latency=args.default_latency,
+        wrap_mode=args.wrap,
+        validate_output=args.validate_output,
+        require_auth=args.require_auth,
+        auth_key=args.auth_key,
+        rate_limit=args.rate_limit,
+        paginate=args.paginate,
+        page_size=args.page_size,
+    )
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'mcp-py/0.1'
-    tools_store: ToolsStore = None  # type: ignore
-    default_latency: int = 0
+    server_version = "mcp-ic/0.2"
+    tools_store: ToolsStore
+    config: ServerConfig
+    rate_limiter: RateLimiter
 
-    def _send_json(self, status: int, obj: Any) -> None:
-        data = json.dumps(obj).encode('utf-8')
+    def _auth_ok(self) -> bool:
+        if not self.config.require_auth:
+            return True
+        key = self.headers.get("X-API-Key") or self.headers.get("Authorization")
+        expected = self.config.auth_key or "demo-key"
+        return key == expected
+
+    def _send_json(self, status: int, obj: Any, headers: Optional[Dict[str, str]] = None) -> None:
+        data = json.dumps(obj).encode("utf-8")
         self.send_response(status)
-        self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Content-Length', str(len(data)))
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        if headers:
+            for key, value in headers.items():
+                self.send_header(key, value)
         self.end_headers()
         self.wfile.write(data)
 
-    def _begin_ndjson(self) -> None:
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/x-ndjson; charset=utf-8')
-        self.send_header('Cache-Control', 'no-cache')
-        self.send_header('Connection', 'keep-alive')
-        self.send_header('Transfer-Encoding', 'chunked')
+    # NDJSON ---------------------------------------------------------------
+    def _begin_stream(self, headers: Optional[Dict[str, str]] = None) -> None:
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        if headers:
+            for key, value in headers.items():
+                self.send_header(key, value)
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Transfer-Encoding", "chunked")
         self.end_headers()
 
-    def _write_chunk(self, data: bytes) -> None:
-        # HTTP/1.1 chunked transfer
-        size = ('%x' % len(data)).encode('ascii')
+    def _write_chunk(self, payload: Dict[str, Any]) -> None:
+        data = (json.dumps(payload) + "\n").encode("utf-8")
+        size = f"{len(data):x}".encode("ascii")
         self.wfile.write(size + b"\r\n" + data + b"\r\n")
         self.wfile.flush()
 
-    def _end_chunks(self) -> None:
+    def _end_stream(self) -> None:
         self.wfile.write(b"0\r\n\r\n")
         self.wfile.flush()
 
-    def do_GET(self) -> None:  # noqa: N802 (method name by BaseHTTPRequestHandler)
+    # GET ------------------------------------------------------------------
+    def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path == '/health':
-            return self._send_json(200, {'ok': True, 'tools_path': self.tools_store.path})
-        if parsed.path == '/tools':
-            q = parse_qs(parsed.query)
-            names = []
-            if 'names' in q:
-                names = [s.strip() for s in ','.join(q.get('names', [])).split(',') if s.strip()]
-            tools_map = self.tools_store.load(names_filter=names)
-            tools = list(tools_map.values())
-            if 'limit' in q:
-                try:
-                    limit = int(q['limit'][0])
-                    tools = tools[:max(0, limit)]
-                except Exception:
-                    pass
-            accept = (self.headers.get('Accept') or '').lower()
-            if 'application/x-ndjson' in accept:
-                self._begin_ndjson()
-                for t in tools:
-                    self._write_chunk((json.dumps(t) + '\n').encode('utf-8'))
-                self._end_chunks()
-                return
-            return self._send_json(200, {'count': len(tools), 'tools': tools})
-        if parsed.path == '/':
-            return self._send_json(200, {
-                'ok': True,
-                'endpoints': ['/health', '/tools', '/invoke?stream=1'],
-                'tools_path': self.tools_store.path,
+        if parsed.path == "/health":
+            return self._send_json(HTTPStatus.OK, {
+                "ok": True,
+                "tools_path": self.tools_store.path,
+                "wrap_mode": self.config.wrap_mode,
             })
-        self._send_json(404, {'error': 'not_found'})
+        if parsed.path == "/tools":
+            if not self._auth_ok():
+                return self._send_json(HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"})
+            params = parse_qs(parsed.query)
+            names_param = params.get("names", [""])[0]
+            names = [name.strip() for name in names_param.split(",") if name.strip()]
+            all_tools = self.tools_store.load(names_filter=names)
+            tools_list = list(all_tools.values())
+            if self.config.paginate:
+                cursor = int(params.get("cursor", ["0"])[0] or 0)
+                page_size = int(params.get("limit", [self.config.page_size])[0])
+                window = tools_list[cursor:cursor + page_size]
+                next_cursor = cursor + len(window)
+                has_more = next_cursor < len(tools_list)
+                payload = {
+                    "count": len(window),
+                    "tools": [entry.as_payload(self.config.wrap_mode) for entry in window],
+                    "next_cursor": next_cursor if has_more else None,
+                }
+                return self._send_json(HTTPStatus.OK, payload)
+            if "limit" in params:
+                try:
+                    limit = int(params.get("limit", ["0"])[0])
+                    if limit > 0:
+                        tools_list = tools_list[:limit]
+                except ValueError:
+                    pass
+            payloads = [entry.as_payload(self.config.wrap_mode) for entry in tools_list]
+            accept = (self.headers.get("Accept") or "").lower()
+            if "application/x-ndjson" in accept:
+                self._begin_stream()
+                for payload in payloads:
+                    self._write_chunk(payload)
+                self._end_stream()
+                return
+            return self._send_json(HTTPStatus.OK, {"count": len(payloads), "tools": payloads})
+        if parsed.path == "/":
+            return self._send_json(HTTPStatus.OK, {
+                "ok": True,
+                "endpoints": ["/health", "/tools", "/invoke?stream=1"],
+                "wrap": self.config.wrap_mode,
+            })
+        return self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
 
+    # POST -----------------------------------------------------------------
     def do_POST(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
-        if parsed.path != '/invoke':
-            return self._send_json(404, {'error': 'not_found'})
-        length = int(self.headers.get('Content-Length') or '0')
-        raw = self.rfile.read(length) if length > 0 else b'{}'
+        if parsed.path != "/invoke":
+            return self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+        if not self._auth_ok():
+            return self._send_json(HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"})
+        length = int(self.headers.get("Content-Length") or 0)
+        raw = self.rfile.read(length) if length else b"{}"
         try:
-            payload = json.loads(raw.decode('utf-8') or '{}')
-        except Exception:
-            return self._send_json(400, {'error': 'invalid_json'})
-
-        q = parse_qs(parsed.query)
-        do_stream = (q.get('stream', ['0'])[0] in ('1', 'true')) or (self.headers.get('x-stream') == '1')
-        tool_name = payload.get('tool') or payload.get('tool_name')
-        input_obj = payload.get('input') or payload.get('params') or {}
-        override_latency = payload.get('latency_ms')
-
+            payload = json.loads(raw.decode("utf-8") or "{}")
+        except json.JSONDecodeError:
+            return self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_json"})
+        tool_name = payload.get("tool") or payload.get("tool_name")
+        if not tool_name:
+            return self._send_json(HTTPStatus.BAD_REQUEST, {"error": "missing_tool"})
         tools_map = self.tools_store.load()
-        tool_def = tools_map.get(tool_name)
-        if not tool_def:
-            return self._send_json(404, {'error': 'tool_not_found', 'tool': tool_name})
-        latency_ms = int(override_latency) if isinstance(override_latency, int) else (
-            tool_def.get('latency_ms') if isinstance(tool_def.get('latency_ms'), int) else self.default_latency
-        )
-
-        if do_stream:
-            events = simulate_events(tool_name, input_obj, tool_def, latency_ms)
-            self._begin_ndjson()
-            # stream events with delays
-            for i, ev in enumerate(events):
-                if i == 1 and latency_ms > 0:  # progress after half
-                    time.sleep(latency_ms / 1000.0 / 2.0)
-                elif i == len(events) - 1 and latency_ms > 0:
-                    # end immediately after result
-                    pass
-                elif i == 2 and latency_ms > 0:
-                    time.sleep(latency_ms / 1000.0 / 2.0)
-                self._write_chunk((json.dumps(ev) + '\n').encode('utf-8'))
-            self._end_chunks()
+        entry = tools_map.get(tool_name)
+        if not entry:
+            return self._send_json(HTTPStatus.NOT_FOUND, {"error": "tool_not_found", "tool": tool_name})
+        schema = entry.schema_variants.get(self.config.wrap_mode, entry.input_schema)
+        input_obj = payload.get("input") or payload.get("params") or {}
+        latency_override = payload.get("latency_ms")
+        latency_ms = _resolve_latency(entry.latency_ms, latency_override, self.config.default_latency)
+        if not self.rate_limiter.allow():
+            return self._send_json(HTTPStatus.TOO_MANY_REQUESTS, {"error": "rate_limited"})
+        validation_error = _validate_input(schema, input_obj)
+        headers = {"X-IC-Tool": f"{entry.ic_score:.3f}"}
+        stream = _should_stream(parsed, self.headers)
+        if validation_error:
+            err_payload = {
+                "error": {
+                    "code": "invalid_input",
+                    "message": validation_error,
+                }
+            }
+            if stream:
+                self._begin_stream(headers=headers)
+                _emit_error_stream(self, tool_name, err_payload["error"], latency_ms)
+                self._end_stream()
+            else:
+                self._send_json(HTTPStatus.BAD_REQUEST, err_payload, headers=headers)
             return
+        response_obj = _simulate_tool(entry, input_obj, latency_ms, self.config.validate_output, schema)
+        if stream:
+            self._begin_stream(headers=headers)
+            for event in response_obj["events"]:
+                self._write_chunk(event)
+            self._end_stream()
+            return
+        self._send_json(HTTPStatus.OK, response_obj["result"], headers=headers)
 
-        # non-stream response
-        events = simulate_events(tool_name, input_obj, tool_def, latency_ms)
-        err_ev = next((e for e in events if e.get('event') == 'error'), None)
-        if err_ev:
-            return self._send_json(400, {'ok': False, 'error': err_ev.get('error'), 'tool': tool_name})
-        result = next((e for e in events if e.get('event') == 'result'), None)
-        output = result.get('output') if result else {'echo': input_obj}
-        return self._send_json(200, {'ok': True, 'tool': tool_name, 'output': output, 'latency_ms': latency_ms})
+
+# Helpers ----------------------------------------------------------------------
+
+def _should_stream(parsed, headers) -> bool:
+    q = parse_qs(parsed.query)
+    if q.get("stream", ["0"])[0] in ("1", "true"):
+        return True
+    return headers.get("x-stream") == "1"
 
 
-def run_server(port: int, tools_path: str, default_latency: int) -> None:
-    Handler.tools_store = ToolsStore(tools_path)
-    Handler.default_latency = default_latency
-    srv = ThreadingHTTPServer(('0.0.0.0', port), Handler)
-    print(f"[mcp-py] listening on http://localhost:{port}")
-    print(f"[mcp-py] tools from {tools_path}")
+def _resolve_latency(tool_latency: Optional[int], override: Any, default: int) -> int:
+    if isinstance(override, int):
+        return max(0, override)
+    if isinstance(tool_latency, int):
+        return max(0, tool_latency)
+    return max(0, default)
+
+
+def _validate_input(schema: Dict[str, Any], payload: Any) -> Optional[str]:
     try:
-        srv.serve_forever()
+        validate(payload, schema)
+    except ValidationError as exc:
+        return exc.message
+    return None
+
+
+def _simulate_tool(
+    entry: ToolEntry,
+    input_obj: Dict[str, Any],
+    latency_ms: int,
+    validate_output: bool,
+    schema: Dict[str, Any],
+) -> Dict[str, Any]:
+    start_ts = int(time.time() * 1000)
+    events: List[Dict[str, Any]] = []
+    events.append({"event": "start", "tool": entry.name, "ts": start_ts})
+    if latency_ms:
+        events.append({"event": "progress", "tool": entry.name, "message": "working", "ts": start_ts + latency_ms // 2})
+    output = _placeholder_from_schema(entry.output_schema, input_obj)
+    if validate_output and entry.output_schema:
+        err = _validate_input(entry.output_schema, output)
+        if err:
+            events.append({
+                "event": "error",
+                "tool": entry.name,
+                "error": {"code": "invalid_output", "message": err},
+                "ts": start_ts + latency_ms,
+            })
+            events.append({"event": "end", "tool": entry.name, "ts": start_ts + latency_ms})
+            return {"events": events, "result": {"ok": False, "error": err}}
+    events.append({
+        "event": "result",
+        "tool": entry.name,
+        "output": output,
+        "ts": start_ts + latency_ms,
+    })
+    events.append({"event": "end", "tool": entry.name, "ts": start_ts + latency_ms})
+    return {
+        "events": events,
+        "result": {
+            "ok": True,
+            "tool": entry.name,
+            "output": output,
+            "latency_ms": latency_ms,
+        },
+    }
+
+
+def _emit_error_stream(handler: Handler, tool: str, error: Dict[str, Any], latency_ms: int) -> None:
+    start_ts = int(time.time() * 1000)
+    handler._write_chunk({"event": "start", "tool": tool, "ts": start_ts})
+    handler._write_chunk({"event": "error", "tool": tool, "error": error, "ts": start_ts + latency_ms})
+    handler._write_chunk({"event": "end", "tool": tool, "ts": start_ts + latency_ms})
+
+
+def _placeholder_from_schema(schema: Optional[Dict[str, Any]], input_obj: Dict[str, Any]) -> Any:
+    if not schema:
+        return {"echo": input_obj}
+    typ = schema.get("type") if isinstance(schema, dict) else None
+    if isinstance(typ, list):
+        non_null = [t for t in typ if t != "null"]
+        typ = non_null[0] if non_null else None
+    if typ == "object" or (typ is None and isinstance(schema.get("properties"), dict)):
+        result: Dict[str, Any] = {}
+        for key, subschema in schema.get("properties", {}).items():
+            result[key] = _placeholder_from_schema(subschema, input_obj)
+        result.setdefault("echo", input_obj)
+        return result
+    if typ == "array":
+        items = schema.get("items") if isinstance(schema.get("items"), dict) else {}
+        return [_placeholder_from_schema(items, input_obj)]
+    if typ == "string":
+        return ""
+    if typ in ("integer", "number"):
+        return 0
+    if typ == "boolean":
+        return False
+    return {"echo": input_obj}
+
+
+def run_server(config: ServerConfig) -> None:
+    tools_store = ToolsStore(config.tools_path, config.wrap_mode)
+    tools_store.load()  # warm cache
+    Handler.tools_store = tools_store
+    Handler.config = config
+    Handler.rate_limiter = RateLimiter(config.rate_limit)
+    server = ThreadingHTTPServer(("0.0.0.0", config.port), Handler)
+    print(f"[mcp-ic] listening on http://localhost:{config.port}")
+    print(f"[mcp-ic] tools file: {config.tools_path} (wrap={config.wrap_mode})")
+    try:
+        server.serve_forever()
     except KeyboardInterrupt:
-        pass
+        print("[mcp-ic] shutting down")
     finally:
-        srv.server_close()
+        server.server_close()
 
 
-if __name__ == '__main__':
-    ns = parse_args()
-    run_server(ns.port, ns.tools, ns.default_latency)
+def main() -> None:
+    config = parse_args()
+    run_server(config)
+
+
+if __name__ == "__main__":
+    main()

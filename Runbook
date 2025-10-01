@@ -10,7 +10,7 @@ OLLAMA_BASE=http://localhost:11434
 
 ## 1) Start server
 ```bash
-python3 server_py/app.py --port 3001 --tools bench/tools.advanced.jsonl \
+python3 server/app.py --port 3001 --tools bench/tools.advanced.jsonl \
   --default-latency 100 --wrap none  # wrap=none|flat|hard
 
 2) Generate tasks
@@ -28,7 +28,7 @@ PYTHONPATH=. python3 bench/report.py --runs runs/ --out runs/report
 
 Smoke test (from README examples)
 
-Server: python3 server_py/app.py --port 3001 --tools bench/tools.advanced.jsonl
+Server: python3 server/app.py --port 3001 --tools bench/tools.advanced.jsonl
 
 Agent single run (Ollama):
 
