@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/ic_features.json",
+  "title": "Interface Complexity Feature Vector",
+  "type": "object",
+  "oneOf": [
+    {
+      "title": "Tool IC entry",
+      "type": "object",
+      "properties": {
+        "scope": {"const": "tool"},
+        "tool_id": {"type": "string"},
+        "server_id": {"type": "string"},
+        "features": {
+          "type": "object",
+          "properties": {
+            "leaf_fields": {"type": "number"},
+            "object_fields": {"type": "number"},
+            "array_fields": {"type": "number"},
+            "total_fields": {"type": "number"},
+            "required_fields": {"type": "number"},
+            "required_ratio": {"type": "number"},
+            "max_depth": {"type": "number"},
+            "union_ops": {"type": "number"},
+            "dependency_ops": {"type": "number"},
+            "enum_bits": {"type": "number"},
+            "numeric_bits": {"type": "number"},
+            "string_burden": {"type": "number"},
+            "array_cost": {"type": "number"},
+            "doc_tokens": {"type": "number"},
+            "missing_examples": {"type": "number"},
+            "log_leaf_fields": {"type": "number"}
+          },
+          "required": [
+            "leaf_fields",
+            "total_fields",
+            "required_fields",
+            "required_ratio",
+            "max_depth",
+            "union_ops",
+            "dependency_ops",
+            "enum_bits",
+            "numeric_bits",
+            "string_burden",
+            "array_cost",
+            "doc_tokens",
+            "missing_examples",
+            "log_leaf_fields"
+          ],
+          "additionalProperties": {"type": "number"}
+        },
+        "components": {"$ref": "#/definitions/weight_contributions"},
+        "score": {"type": "number"},
+        "metadata": {"type": "object"}
+      },
+      "required": ["scope", "tool_id", "server_id", "features", "components", "score"],
+      "additionalProperties": true
+    },
+    {
+      "title": "Server IC entry",
+      "type": "object",
+      "properties": {
+        "scope": {"const": "server"},
+        "server_id": {"type": "string"},
+        "server_name": {"type": "string"},
+        "features": {
+          "type": "object",
+          "properties": {
+            "tool_count": {"type": "number"},
+            "log_tool_count": {"type": "number"},
+            "mean_ic_tool": {"type": "number"},
+            "ambiguity": {"type": "number"},
+            "naming_inconsistency": {"type": "number"},
+            "statefulness": {"type": "number"},
+            "doc_burden": {"type": "number"}
+          },
+          "required": [
+            "tool_count",
+            "log_tool_count",
+            "mean_ic_tool",
+            "ambiguity",
+            "naming_inconsistency",
+            "statefulness",
+            "doc_burden"
+          ],
+          "additionalProperties": {"type": "number"}
+        },
+        "components": {"$ref": "#/definitions/weight_contributions"},
+        "score": {"type": "number"},
+        "tool_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["scope", "server_id", "features", "components", "score", "tool_ids"],
+      "additionalProperties": true
+    },
+    {
+      "title": "Set IC entry",
+      "type": "object",
+      "properties": {
+        "scope": {"const": "set"},
+        "tools": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "features": {
+          "type": "object",
+          "properties": {
+            "k": {"type": "number"},
+            "log_k": {"type": "number"},
+            "redundancy": {"type": "number"},
+            "token_load": {"type": "number"},
+            "mean_ic_tool": {"type": "number"},
+            "server_diversity": {"type": "number"}
+          },
+          "required": [
+            "k",
+            "log_k",
+            "redundancy",
+            "token_load",
+            "mean_ic_tool",
+            "server_diversity"
+          ],
+          "additionalProperties": {"type": "number"}
+        },
+        "components": {"$ref": "#/definitions/weight_contributions"},
+        "score": {"type": "number"}
+      },
+      "required": ["scope", "tools", "features", "components", "score"],
+      "additionalProperties": true
+    }
+  ],
+  "definitions": {
+    "weight_contributions": {
+      "type": "object",
+      "additionalProperties": {"type": "number"}
+    }
+  }
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "calls": 0.0,
+    "pass_at_1_overall": 0.0,
+    "avg_latency_ms": 0.0,
+    "model": {
+      "provider": "ollama",
+      "name": "stub"
+    },
+    "condition": "BASE",
+    "output_dir": "runs/test/stub_base"
+  }
+]

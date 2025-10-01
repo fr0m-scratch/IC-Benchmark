@@ -1,0 +1,11 @@
+{
+  "calls": 30.0,
+  "pass_at_1": 0.0,
+  "first_try_valid": 0.6333333333333333,
+  "avg_retries": 1.0,
+  "avg_latency_ms": 5.584220766666759,
+  "pass_at_1_low": 0.0,
+  "pass_at_1_medium": 0.0,
+  "tasks": 10,
+  "pass_at_1_overall": 0.0
+}

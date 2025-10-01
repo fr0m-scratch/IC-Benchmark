@@ -1,0 +1,6 @@
+
+MCP-style endpoints are already present and stream events; maintain compatibility.
+
+Use JSON Schema constrained decoding; fall back to slot-by-slot fill for high-IC.
+
+Log structured telemetry for every stage to support ablations and paper plots.

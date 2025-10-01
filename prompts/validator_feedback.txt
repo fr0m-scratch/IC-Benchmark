@@ -1,0 +1,7 @@
+Previous call failed due to a schema violation:
+
+<schema_violation_summary>
+
+Fix only what is necessary. Output either:
+- A corrected full arguments object (if SIMPLE), or
+- One slot update (if HIGH_COMPLEXITY), using the slot_filling format.

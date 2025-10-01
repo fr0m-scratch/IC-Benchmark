@@ -1,0 +1,7 @@
+Given the tool schema and the current partially filled object, produce exactly one slot update:
+{"slot":"<json-pointer-like-path>", "value": <json-value>}
+
+Rules:
+- Fill required fields first.
+- Respect enums, formats, numeric ranges, cross-field constraints noted by the validator feedback.
+- Do not change other fields.

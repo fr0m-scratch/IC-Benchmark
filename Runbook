@@ -1,0 +1,37 @@
+
+## 0) Env
+Create `.env`:
+
+
+GEMINI_API_KEY=...
+FIREWORKS_API_KEY=...
+OLLAMA_BASE=http://localhost:11434
+
+
+## 1) Start server
+```bash
+python3 server_py/app.py --port 3001 --tools bench/tools.advanced.jsonl \
+  --default-latency 100 --wrap none  # wrap=none|flat|hard
+
+2) Generate tasks
+PYTHONPATH=. python3 bench/taskgen.py --tools tools.jsonl \
+  --out tests/fuzzy_tasks.jsonl --tiers realistic --seed 42
+
+3) End-to-end (local SLM)
+PYTHONPATH=. python3 bench/run_e2e.py --config configs/local_qwen.yaml
+
+4) Benchmark grid (SLM vs LLM; conditions)
+PYTHONPATH=. python3 bench/run_bench.py --config configs/ablation.yaml
+
+5) Reports
+PYTHONPATH=. python3 bench/report.py --runs runs/ --out runs/report
+
+Smoke test (from README examples)
+
+Server: python3 server_py/app.py --port 3001 --tools bench/tools.advanced.jsonl
+
+Agent single run (Ollama):
+
+PYTHONPATH=. python3 bench/agent.py --model qwen2.5:7b-instruct \
+  --prompt "Add 2 and 3." --server http://localhost:3001 \
+  --ollama http://localhost:11434 --max-steps 3 --retry 1

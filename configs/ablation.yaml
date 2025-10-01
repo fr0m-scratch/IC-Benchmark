@@ -1,0 +1,33 @@
+server:
+  launch: true
+  port: 3001
+  tools_path: tools.jsonl
+  wrap: none
+retrieval:
+  k: 6
+  ic_penalty_mu: 0.6
+  redundancy_penalty_nu: 0.3
+complexity:
+  slot_threshold: 0.65
+  gate_threshold: 0.05
+limits:
+  max_steps: 6
+  max_retries: 2
+tasks:
+  path: tests/fuzzy_tasks.jsonl
+logging:
+  out_dir: runs/ablation
+model:
+  provider: ollama
+  name: qwen2.5:7b-instruct
+
+grid:
+  models:
+    - {provider: ollama, name: qwen2.5:7b-instruct}
+    - {provider: fireworks, name: accounts/fireworks/models/llama-3.1-70b-instruct}
+  conditions:
+    - {name: BASE, retrieval_ic: false, wrap: none, slot_policy: simple}
+    - {name: +RET, retrieval_ic: true, wrap: none, slot_policy: simple}
+    - {name: +WRAP, retrieval_ic: false, wrap: flat, slot_policy: simple}
+    - {name: +SLOT, retrieval_ic: false, wrap: none, slot_policy: slot_by_slot}
+    - {name: FULL, retrieval_ic: true, wrap: flat, slot_policy: slot_by_slot}
