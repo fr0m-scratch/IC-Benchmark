@@ -173,6 +173,8 @@ def run_experiment(config: ExperimentConfig) -> Dict[str, Any]:
         metrics_tracker = MetricsTracker()
         successes = 0.0
         total_calls = 0.0
+        selections_total = 0.0
+        selections_correct = 0.0
         with results_path.open("w", encoding="utf-8") as sink:
             for task in tasks:
                 prompt = task.get("instruction") or task.get("prompt") or task.get("query")
@@ -191,11 +193,34 @@ def run_experiment(config: ExperimentConfig) -> Dict[str, Any]:
                 total_calls += calls
                 successes += summary.get("pass_at_1", 0.0) * calls
                 metrics_tracker.logs.extend(agent.metrics.logs)
+                metrics_tracker.add_tokens(summary.get("token_input", 0.0), summary.get("token_output", 0.0))
                 agent.metrics.logs.clear()
+                # Tool selection accuracy (if ground-truth available)
+                expected = task.get("expect") or {}
+                expected_tool = None
+                if isinstance(expected, dict):
+                    if expected.get("tool"):
+                        expected_tool = expected.get("tool")
+                    else:
+                        seq = expected.get("tool_sequence") or []
+                        if isinstance(seq, list) and seq:
+                            expected_tool = seq[-1]
+                selected_tool = None
+                telemetry: List[Dict[str, Any]] = result.get("telemetry") or []  # type: ignore[name-defined]
+                for event in telemetry:
+                    if event.get("event") == "gate":
+                        selected_tool = event.get("selected_tool")
+                        break
+                if expected_tool and selected_tool:
+                    selections_total += 1.0
+                    if expected_tool == selected_tool:
+                        selections_correct += 1.0
         aggregated = metrics_tracker.summarise()
         aggregated.update({
             "tasks": len(tasks),
             "pass_at_1_overall": successes / total_calls if total_calls else 0.0,
+            "selections": selections_total,
+            "tool_select_acc": selections_correct / selections_total if selections_total else 0.0,
         })
         summary_path = config.output_dir / "summary.json"
         summary_path.write_text(json.dumps(aggregated, indent=2), encoding="utf-8")

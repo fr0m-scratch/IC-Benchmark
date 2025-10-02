@@ -212,6 +212,7 @@ class AgentExecutor:
             ChatMessage("user", full_argument_prompt(schema, task_context)),
         ]
         response = self.provider.generate(messages, temperature=self.config.temperature)
+        self._account_tokens(messages, response.text)
         arguments = _extract_json(response.text)
         if not isinstance(arguments, dict):
             arguments = {}
@@ -242,6 +243,7 @@ class AgentExecutor:
                 ChatMessage("user", prompt + f"\nContext: {context}"),
             ]
             response = self.provider.generate(messages, temperature=0.0)
+            self._account_tokens(messages, response.text)
             update = _extract_json(response.text)
             if not isinstance(update, dict) or "slot" not in update:
                 break
@@ -277,6 +279,7 @@ class AgentExecutor:
             ChatMessage("user", prompt),
         ]
         response = self.provider.generate(messages, temperature=0.0)
+        self._account_tokens(messages, response.text)
         fix = _extract_json(response.text)
         if not isinstance(fix, dict):
             return arguments, False
@@ -293,6 +296,13 @@ class AgentExecutor:
             return f"No tool call executed. Prompt: {prompt}"
         parts = [f"Tool {item['tool_id']} output: {json.dumps(item['output'], ensure_ascii=False)}" for item in scratchpad]
         return " \n".join(parts)
+
+    def _account_tokens(self, messages: List[ChatMessage], output_text: str) -> None:
+        # Lightweight heuristic: ~4 chars per token
+        prompt_text = "\n".join(m.content for m in messages)
+        in_tokens = max(len(prompt_text) / 4.0, 0.0)
+        out_tokens = max(len(output_text or "") / 4.0, 0.0)
+        self.metrics.add_tokens(in_tokens, out_tokens)
 
 
 def _load_prompt(name: str) -> str:

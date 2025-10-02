@@ -83,10 +83,13 @@ Ship a production-quality, reproducible E2E system that:
 ## Commands (expected to work)
 See `docs/RUNBOOK.md`. Smoke:
 ```bash
-python3 server/app.py --port 3001 --tools bench/tools.advanced.jsonl
-PYTHONPATH=. python3 bench/agent.py --model qwen2.5:7b-instruct \
+# Start server
+python3 server/app.py --port 3001 --tools tools.jsonl
+
+# Single prompt (uses live /tools from server)
+PYTHONPATH=. python3 bench/agent.py --provider ollama --model qwen2.5:7b-instruct \
   --server http://localhost:3001 --ollama http://localhost:11434 \
   --prompt "Add 2 and 3." --max-steps 3 --retry 1
 
-# End-to-end:
+# End-to-end with tasks + logging
 PYTHONPATH=. python3 bench/run_e2e.py --config configs/local_qwen.yaml

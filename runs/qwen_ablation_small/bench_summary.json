@@ -1,0 +1,120 @@
+[
+  {
+    "calls": 12.0,
+    "steps": 12.0,
+    "pass_at_1": 0.75,
+    "first_try_valid": 0.75,
+    "avg_retries": 0.16666666666666666,
+    "avg_latency_ms": 10.634166583333714,
+    "tool_switches": 2.0,
+    "token_input": 20796.75,
+    "token_output": 792.0,
+    "pass_at_1_medium": 0.7142857142857143,
+    "pass_at_1_low": 0.8,
+    "tasks": 3,
+    "pass_at_1_overall": 0.75,
+    "selections": 3.0,
+    "tool_select_acc": 1.0,
+    "model": {
+      "provider": "ollama",
+      "name": "qwen2.5:7b-instruct",
+      "base_url": "http://localhost:11434"
+    },
+    "condition": "BASE",
+    "output_dir": "runs/qwen_ablation_small/qwen2-5-7b-instruct_base"
+  },
+  {
+    "calls": 11.0,
+    "steps": 11.0,
+    "pass_at_1": 0.6363636363636364,
+    "first_try_valid": 0.6363636363636364,
+    "avg_retries": 0.18181818181818182,
+    "avg_latency_ms": 8.584287727276516,
+    "tool_switches": 3.0,
+    "token_input": 10491.5,
+    "token_output": 569.5,
+    "pass_at_1_low": 0.6363636363636364,
+    "tasks": 3,
+    "pass_at_1_overall": 0.6363636363636364,
+    "selections": 3.0,
+    "tool_select_acc": 0.3333333333333333,
+    "model": {
+      "provider": "ollama",
+      "name": "qwen2.5:7b-instruct",
+      "base_url": "http://localhost:11434"
+    },
+    "condition": "+RET",
+    "output_dir": "runs/qwen_ablation_small/qwen2-5-7b-instruct_ret"
+  },
+  {
+    "calls": 9.0,
+    "steps": 9.0,
+    "pass_at_1": 0.5555555555555556,
+    "first_try_valid": 1.0,
+    "avg_retries": 0.2222222222222222,
+    "avg_latency_ms": 9.264342555555219,
+    "tool_switches": 2.0,
+    "token_input": 15828.25,
+    "token_output": 831.0,
+    "pass_at_1_medium": 0.7142857142857143,
+    "pass_at_1_low": 0.0,
+    "tasks": 3,
+    "pass_at_1_overall": 0.5555555555555556,
+    "selections": 3.0,
+    "tool_select_acc": 1.0,
+    "model": {
+      "provider": "ollama",
+      "name": "qwen2.5:7b-instruct",
+      "base_url": "http://localhost:11434"
+    },
+    "condition": "+WRAP",
+    "output_dir": "runs/qwen_ablation_small/qwen2-5-7b-instruct_wrap"
+  },
+  {
+    "calls": 12.0,
+    "steps": 12.0,
+    "pass_at_1": 0.75,
+    "first_try_valid": 0.75,
+    "avg_retries": 0.16666666666666666,
+    "avg_latency_ms": 8.329031166666093,
+    "tool_switches": 2.0,
+    "token_input": 20959.25,
+    "token_output": 968.0,
+    "pass_at_1_medium": 0.7142857142857143,
+    "pass_at_1_low": 0.8,
+    "tasks": 3,
+    "pass_at_1_overall": 0.75,
+    "selections": 3.0,
+    "tool_select_acc": 1.0,
+    "model": {
+      "provider": "ollama",
+      "name": "qwen2.5:7b-instruct",
+      "base_url": "http://localhost:11434"
+    },
+    "condition": "+SLOT",
+    "output_dir": "runs/qwen_ablation_small/qwen2-5-7b-instruct_slot"
+  },
+  {
+    "calls": 6.0,
+    "steps": 6.0,
+    "pass_at_1": 0.0,
+    "first_try_valid": 0.6666666666666666,
+    "avg_retries": 0.5,
+    "avg_latency_ms": 8.386465500000403,
+    "tool_switches": 2.0,
+    "token_input": 3884.5,
+    "token_output": 189.0,
+    "pass_at_1_low": 0.0,
+    "tasks": 3,
+    "pass_at_1_overall": 0.0,
+    "selections": 3.0,
+    "tool_select_acc": 0.3333333333333333,
+    "model": {
+      "provider": "ollama",
+      "name": "qwen2.5:7b-instruct",
+      "base_url": "http://localhost:11434"
+    },
+    "condition": "FULL",
+    "output_dir": "runs/qwen_ablation_small/qwen2-5-7b-instruct_full"
+  }
+]

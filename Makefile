@@ -1,6 +1,16 @@
 PYTHON ?= python3
+VENV ?= .venv
+PIP ?= $(VENV)/bin/pip
+VPY ?= $(VENV)/bin/python
 
 .PHONY: tasks e2e bench report server tests
+
+.PHONY: venv bench-venv e2e-venv
+
+venv:
+	$(PYTHON) -m venv $(VENV)
+	$(PIP) install -U pip setuptools wheel
+	$(PIP) install -r requirements.txt
 
 server:
 	$(PYTHON) server/app.py --port 3001 --tools tools.jsonl
@@ -13,6 +23,12 @@ e2e:
 
 bench:
 	PYTHONPATH=. $(PYTHON) bench/run_bench.py --config configs/ablation.yaml
+
+bench-venv: venv
+	PYTHONPATH=. $(VPY) bench/run_bench.py --config configs/ablation.yaml
+
+e2e-venv: venv
+	PYTHONPATH=. $(VPY) bench/run_e2e.py --config configs/local_qwen.yaml
 
 report:
 	PYTHONPATH=. $(PYTHON) bench/report.py --runs runs --out runs/report

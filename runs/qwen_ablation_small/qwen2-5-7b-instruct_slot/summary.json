@@ -1,0 +1,17 @@
+{
+  "calls": 12.0,
+  "steps": 12.0,
+  "pass_at_1": 0.75,
+  "first_try_valid": 0.75,
+  "avg_retries": 0.16666666666666666,
+  "avg_latency_ms": 8.329031166666093,
+  "tool_switches": 2.0,
+  "token_input": 20959.25,
+  "token_output": 968.0,
+  "pass_at_1_medium": 0.7142857142857143,
+  "pass_at_1_low": 0.8,
+  "tasks": 3,
+  "pass_at_1_overall": 0.75,
+  "selections": 3.0,
+  "tool_select_acc": 1.0
+}
