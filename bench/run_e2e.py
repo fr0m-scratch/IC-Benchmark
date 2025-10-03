@@ -180,15 +180,25 @@ def run_experiment(config: ExperimentConfig) -> Dict[str, Any]:
                 prompt = task.get("instruction") or task.get("prompt") or task.get("query")
                 if not prompt:
                     continue
-                result = agent.run(prompt)
-                sink.write(json.dumps({
-                    "task": task.get("id"),
-                    "prompt": prompt,
-                    "final_answer": result.get("final_answer"),
-                    "telemetry": result.get("telemetry"),
-                    "metrics": result.get("metrics"),
-                }, ensure_ascii=False) + "\n")
-                summary = result.get("metrics", {})
+                try:
+                    result = agent.run(prompt)
+                    record = {
+                        "task": task.get("id"),
+                        "prompt": prompt,
+                        "final_answer": result.get("final_answer"),
+                        "telemetry": result.get("telemetry"),
+                        "metrics": result.get("metrics"),
+                    }
+                    summary = result.get("metrics", {})
+                except Exception as exc:  # tolerate provider/network failures per task
+                    record = {
+                        "task": task.get("id"),
+                        "prompt": prompt,
+                        "error": str(exc)[:400],
+                        "metrics": {"calls": 0.0, "pass_at_1": 0.0, "token_input": 0.0, "token_output": 0.0},
+                    }
+                    summary = record["metrics"]
+                sink.write(json.dumps(record, ensure_ascii=False) + "\n")
                 calls = summary.get("calls", 0.0)
                 total_calls += calls
                 successes += summary.get("pass_at_1", 0.0) * calls

@@ -11,8 +11,8 @@ complexity:
   slot_threshold: 0.65
   gate_threshold: 0.05
 limits:
-  max_steps: 6
-  max_retries: 2
+  max_steps: 3
+  max_retries: 1
 tasks:
   path: tests/fuzzy_tasks.jsonl
 logging:
@@ -20,11 +20,13 @@ logging:
 model:
   provider: ollama
   name: qwen2.5:7b-instruct
+  timeout: 120
 
 grid:
   models:
     - {provider: ollama, name: qwen2.5:7b-instruct}
-    - {provider: fireworks, name: accounts/fireworks/models/llama-3.1-70b-instruct}
+    - {provider: fireworks, name: accounts/fireworks/models/glm-4p5-air}
+    - {provider: gemini, name: models/gemini-2.5-flash}
   conditions:
     - {name: BASE, retrieval_ic: false, wrap: none, slot_policy: simple}
     - {name: +RET, retrieval_ic: true, wrap: none, slot_policy: simple}

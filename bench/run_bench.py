@@ -7,8 +7,10 @@ import copy
 import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
+import os
 
 from bench import run_e2e
+import requests
 
 try:
     import yaml
@@ -34,6 +36,37 @@ def run_grid(config_path: Path) -> List[Dict[str, Any]]:
     conditions = grid.get("conditions") or []
     if not models or not conditions:
         raise ValueError("grid.models and grid.conditions must be defined")
+    
+    def _model_ready(model: Dict[str, Any]) -> bool:
+        provider = (model.get("provider") or "").lower()
+        if provider == "gemini":
+            return bool(model.get("api_key") or os.getenv("GEMINI_API_KEY"))
+        if provider == "fireworks":
+            # Accept either FIREWORKS_API_KEY or legacy FIREWORK_API_KEY
+            return bool(
+                model.get("api_key")
+                or os.getenv("FIREWORKS_API_KEY")
+                or os.getenv("FIREWORK_API_KEY")
+            )
+        # ollama or others: assume ready
+        if provider == "ollama":
+            base = model.get("base_url") or os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            try:
+                resp = requests.get(f"{base.rstrip('/')}/api/tags", timeout=2)
+                return resp.status_code < 500
+            except requests.RequestException:
+                return False
+        return True
+
+    # Skip providers that are not configured locally (no API key)
+    ready_models = [m for m in models if _model_ready(m)]
+    skipped = [m for m in models if m not in ready_models]
+    if skipped:
+        skipped_names = ", ".join(f"{m.get('provider')}:{m.get('name')}" for m in skipped)
+        print(f"[run_bench] Skipping models with missing credentials: {skipped_names}")
+    models = ready_models
+    if not models:
+        raise RuntimeError("No runnable models after filtering for credentials. Set GEMINI_API_KEY/FIREWORKS_API_KEY or provide api_key in config.")
 
     base_logging = Path(data.get("logging", {}).get("out_dir", "runs/bench"))
     base_retrieval = data.get("retrieval", {}).copy()

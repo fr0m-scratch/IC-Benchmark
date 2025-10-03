@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import time
+import random
 import os
 import re
 from dataclasses import dataclass
@@ -119,6 +121,8 @@ class FireworksProvider:
         self.model = config.model
         self.api_key = config.api_key or os.getenv("FIREWORKS_API_KEY")
         self.timeout = config.timeout
+        self._min_interval = 1.2  # seconds between requests (simple client-side throttle)
+        self._last_ts = 0.0
         if not self.api_key:
             raise ChatError("Missing FIREWORKS_API_KEY environment variable")
 
@@ -135,12 +139,26 @@ class FireworksProvider:
             "messages": [{"role": m.role, "content": m.content} for m in messages],
         }
         url = kwargs.get("base_url") or "https://api.fireworks.ai/inference/v1/chat/completions"
-        resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=self.timeout)
-        if resp.status_code >= 400:
-            raise ChatError(f"Fireworks error {resp.status_code}: {resp.text[:200]}")
-        data = resp.json()
-        text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-        return ChatResult(text=text, raw=data, provider="fireworks")
+        attempts = 0
+        while True:
+            # simple client-side pacing
+            now = time.time()
+            sleep_for = self._min_interval - (now - self._last_ts)
+            if sleep_for > 0:
+                time.sleep(sleep_for)
+            resp = requests.post(url, headers=headers, data=json.dumps(payload), timeout=self.timeout)
+            self._last_ts = time.time()
+            if resp.status_code == 429 and attempts < 4:
+                # naive backoff on rate limit
+                delay = (2 ** attempts) + random.uniform(0.1, 0.4)
+                time.sleep(delay)
+                attempts += 1
+                continue
+            if resp.status_code >= 400:
+                raise ChatError(f"Fireworks error {resp.status_code}: {resp.text[:200]}")
+            data = resp.json()
+            text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            return ChatResult(text=text, raw=data, provider="fireworks")
 
 
 def build_provider(config: ProviderConfig) -> ChatProvider:
