@@ -10,16 +10,6 @@
     "ic_score": 5.553771237954946
   },
   {
-    "request": "What's the live temperature near NYC? (lat 40.7128, lon -74.0060)",
-    "target_tool": {
-      "server_id": "@MehmetFatihAktas/weather-mcp",
-      "server_name": "Weather Information Server",
-      "tool_name": "get_live_temp"
-    },
-    "bucket": "Hard",
-    "ic_score": 10.483054952396705
-  },
-  {
     "request": "Quick math: can you add 100 + 250?",
     "target_tool": {
       "server_id": "@Huramkin/add_mcp",
@@ -70,16 +60,6 @@
     "ic_score": 10.483054952396705
   },
   {
-    "request": "Could you get the forecast for lat 34.0200, lon -118.4900?",
-    "target_tool": {
-      "server_id": "@makingendless/endless-mcp",
-      "server_name": "Endless",
-      "tool_name": "get-forecast"
-    },
-    "bucket": "Hard",
-    "ic_score": 13.471975740615548
-  },
-  {
     "request": "Can you suggest some conferences related to python and machine learning that are happening soon, like in the next six months, so I can plan my schedule accordingly?",
     "target_tool": {
       "server_id": "@ismailbl72/call-for-papers-mcp",
@@ -120,7 +100,7 @@
     "ic_score": 5.36073312532452
   },
   {
-    "request": "What’s the live temperature in LA? (34.0522, -118.2437)",
+    "request": "What's the live temperature in LA? (34.0522, -118.2437)",
     "target_tool": {
       "server_id": "@emineturan/weather",
       "server_name": "Weather Service",
@@ -150,7 +130,7 @@
     "ic_score": 16.895841713443957
   },
   {
-    "request": "What’s the current temperature around 37.7749, -122.4194 (SF)?",
+    "request": "What's the current temperature around 37.7749, -122.4194 (SF)?",
     "target_tool": {
       "server_id": "@ebubekirkarakurt/mcp-word",
       "server_name": "MCP-WORD Server",
@@ -270,7 +250,7 @@
     "ic_score": 11.140087347866361
   },
   {
-    "request": "I’m working on a RN Skia swipe-to-reveal list item—could you outline a performant approach with steps, techniques, and sample code?",
+    "request": "I'm working on a RN Skia swipe-to-reveal list item—could you outline a performant approach with steps, techniques, and sample code?",
     "target_tool": {
       "server_id": "@mahecode/mcp-react-native-skia",
       "server_name": "React Native Skia Animation Thinking Tool",
@@ -370,7 +350,7 @@
     "ic_score": 8.11254247590989
   },
   {
-    "request": "Could you analyze and rate this prompt’s quality: 'Write a concise email to schedule a team meeting next Tuesday at 10am.'",
+    "request": "Could you analyze and rate this prompt's quality: 'Write a concise email to schedule a team meeting next Tuesday at 10am.'",
     "target_tool": {
       "server_id": "@su-record/hi-ai",
       "server_name": "Hi-AI",
@@ -398,16 +378,6 @@
     },
     "bucket": "Hard",
     "ic_score": 10.900149143730406
-  },
-  {
-    "request": "Can you help me understand the new compound's properties by drawing an analogy with water's structure and behavior, considering both atomic composition and chemical bonding, so I can make some educated guesses about its performance in various conditions and weigh the usefulness of this analogy?",
-    "target_tool": {
-      "server_id": "@waldzellai/analogical-reasoning",
-      "server_name": "Analogical Reasoning Server",
-      "tool_name": "analogicalReasoning"
-    },
-    "bucket": "Hard",
-    "ic_score": 37.232595586794844
   },
   {
     "request": "Can you give me a list of the top 5 most recent internet-connected devices running Apache HTTP Server in the US, along with their geographic distribution, services, and any known vulnerabilities, within the next 30 days?",
