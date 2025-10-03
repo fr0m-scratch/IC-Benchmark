@@ -1,0 +1,532 @@
+[
+  {
+    "request": "Could you fetch the IBGE country record for code 76 (Brazil)?",
+    "target_tool": {
+      "server_id": "@edibertoalves/mcp_ibge",
+      "server_name": "IBGE Municipality Listing Server",
+      "tool_name": "GetPaisPorIdentificador"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.553771237954946
+  },
+  {
+    "request": "What's the live temperature near NYC? (lat 40.7128, lon -74.0060)",
+    "target_tool": {
+      "server_id": "@MehmetFatihAktas/weather-mcp",
+      "server_name": "Weather Information Server",
+      "tool_name": "get_live_temp"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.483054952396705
+  },
+  {
+    "request": "Quick math: can you add 100 + 250?",
+    "target_tool": {
+      "server_id": "@Huramkin/add_mcp",
+      "server_name": "Add Numbers Server",
+      "tool_name": "add_numbers"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.430554952396704
+  },
+  {
+    "request": "What's my BMI if I'm 175 cm and 70 kg?",
+    "target_tool": {
+      "server_id": "@hereisnitish/mcp-server",
+      "server_name": "MCP Server",
+      "tool_name": "get_bmi"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.465554952396705
+  },
+  {
+    "request": "Is July 4, 2025 a holiday in the US?",
+    "target_tool": {
+      "server_id": "@ismailcan0/publicholidaysmcp",
+      "server_name": "Public Holidays Service",
+      "tool_name": "check_holiday"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.836356189774726
+  },
+  {
+    "request": "Please add a :thumbsup: reaction to message 1727661234.000200 in channel C12345678.",
+    "target_tool": {
+      "server_id": "@smithery-ai/slack",
+      "server_name": "Slack",
+      "tool_name": "slack_add_reaction"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.3525
+  },
+  {
+    "request": "What's the current temperature in Tokyo, Japan, which is at 35.69° N and 139.77° E?",
+    "target_tool": {
+      "server_id": "@ismailbl72/weather-forecast-mcp-main12",
+      "server_name": "Weather Forecast Service",
+      "tool_name": "get_live_temp"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.483054952396705
+  },
+  {
+    "request": "Could you get the forecast for lat 34.0200, lon -118.4900?",
+    "target_tool": {
+      "server_id": "@makingendless/endless-mcp",
+      "server_name": "Endless",
+      "tool_name": "get-forecast"
+    },
+    "bucket": "Hard",
+    "ic_score": 13.471975740615548
+  },
+  {
+    "request": "Can you suggest some conferences related to python and machine learning that are happening soon, like in the next six months, so I can plan my schedule accordingly?",
+    "target_tool": {
+      "server_id": "@ismailbl72/call-for-papers-mcp",
+      "server_name": "ConferenceSearcher",
+      "tool_name": "get_events"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.77924123853187
+  },
+  {
+    "request": "Could you search Hugging Face Spaces for 'diffusers' and show up to 10 results?",
+    "target_tool": {
+      "server_id": "@shreyaskarnik/huggingface-mcp-server",
+      "server_name": "Hugging Face MCP Server",
+      "tool_name": "search-spaces"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.62424123853187
+  },
+  {
+    "request": "Please send an email to my colleague with subject 'Meeting Reminder' and body 'Hello, this is a reminder about our team meeting next week. Please check your schedule'.",
+    "target_tool": {
+      "server_id": "@TKelvyn/mcp",
+      "server_name": "mcp max",
+      "tool_name": "send_email_tool"
+    },
+    "bucket": "Hard",
+    "ic_score": 6.232970000576925
+  },
+  {
+    "request": "What are the top 10 trending Python developers on GitHub who have been active over the past week, and could you give me a list of their GitHub usernames?",
+    "target_tool": {
+      "server_id": "@hetaoBackend/mcp-github-trending",
+      "server_name": "GitHub Trending",
+      "tool_name": "get_github_trending_developers"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.36073312532452
+  },
+  {
+    "request": "What’s the live temperature in LA? (34.0522, -118.2437)",
+    "target_tool": {
+      "server_id": "@emineturan/weather",
+      "server_name": "Weather Service",
+      "tool_name": "get_live_temp"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.483054952396705
+  },
+  {
+    "request": "Please search arXiv for 'Graph Neural Networks' (up to 10 results).",
+    "target_tool": {
+      "server_id": "@daheepk/arxiv-paper-mcp",
+      "server_name": "arXiv Research Assistant",
+      "tool_name": "search_papers"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.79674123853187
+  },
+  {
+    "request": "Here's a picture of a cat sitting on a couch. Can you generate a realistic image URL that shows a similar scene - a cat on a couch, preferably with a sunset in the background?",
+    "target_tool": {
+      "server_id": "@falahgs/flux-imagegen-mcp-server",
+      "server_name": "Flux ImageGen Server",
+      "tool_name": "generateImageUrl"
+    },
+    "bucket": "Hard",
+    "ic_score": 16.895841713443957
+  },
+  {
+    "request": "What’s the current temperature around 37.7749, -122.4194 (SF)?",
+    "target_tool": {
+      "server_id": "@ebubekirkarakurt/mcp-word",
+      "server_name": "MCP-WORD Server",
+      "tool_name": "get_live_temp"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.483054952396705
+  },
+  {
+    "request": "Can you multiply 4 by 3 for me?",
+    "target_tool": {
+      "server_id": "@swaroopkasaraneni/math-mcp-server",
+      "server_name": "Math Operations Server",
+      "tool_name": "multiply"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.930512476486815
+  },
+  {
+    "request": "Could you sketch a flowchart of our user signup, with the key nodes and transitions?",
+    "target_tool": {
+      "server_id": "@waldzellai/visual-reasoning",
+      "server_name": "Visual Reasoning Server",
+      "tool_name": "visualReasoning"
+    },
+    "bucket": "Hard",
+    "ic_score": 20.8997331166055
+  },
+  {
+    "request": "Could you pull the top 5 AI news from the last 30 days and summarize them?",
+    "target_tool": {
+      "server_id": "@jmanek/google-news-trends-mcp",
+      "server_name": "Google News and Trends",
+      "tool_name": "get_news_by_keyword"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.94844000115385
+  },
+  {
+    "request": "Hey, can you check my balance on Binance spot?",
+    "target_tool": {
+      "server_id": "@doggybee/mcp-server-ccxt",
+      "server_name": "CCXT MCP Server",
+      "tool_name": "account-balance"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.370337643276238
+  },
+  {
+    "request": "Could you search Google Scholar for 'transformer interpretability' and give me up to 10 hits?",
+    "target_tool": {
+      "server_id": "@mochow13/google-scholar-mcp",
+      "server_name": "Google Scholar Search Server",
+      "tool_name": "search_google_scholar"
+    },
+    "bucket": "Hard",
+    "ic_score": 17.575034391123882
+  },
+  {
+    "request": "Can you help me create a clustered index on the 'employee_id' and 'last_name' columns in the 'employees' table, within the 'hr' schema of the 'mssql_server' database, so that employee records can be uniquely identified by 'employee_id' and 'last_name' for the next 3 months?",
+    "target_tool": {
+      "server_id": "@ssdavidai/mssql-mcp",
+      "server_name": "MSSQL Server Integration",
+      "tool_name": "create_index"
+    },
+    "bucket": "Hard",
+    "ic_score": 8.583383937646083
+  },
+  {
+    "request": "Do you know which geologic time interval matches ~66 million years?",
+    "target_tool": {
+      "server_id": "@blake365/macrostrat-mcp",
+      "server_name": "Macrostrat API Server",
+      "tool_name": "timescale"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.93254247590989
+  },
+  {
+    "request": "some help planning a quick trip to visit the top 5 beaches in Florida within the next 7 days. Can you suggest the top beaches, consider the weather forecast, and recommend the closest ones to Miami, Tampa, and Jacksonville, including any local events, natural attractions, and transportation options?",
+    "target_tool": {
+      "server_id": "@gradusnikov/google-search-mcp-server",
+      "server_name": "Google Search Server",
+      "tool_name": "search_google"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.79674123853187
+  },
+  {
+    "request": "Can you create a trigger for me on the orders table?",
+    "target_tool": {
+      "server_id": "@HenkDz/postgresql-mcp-server",
+      "server_name": "PostgreSQL Database Management Server",
+      "tool_name": "pg_manage_triggers"
+    },
+    "bucket": "Hard",
+    "ic_score": 16.094102744668476
+  },
+  {
+    "request": "Quick math: can you add 123.45 and 678.90 for me?",
+    "target_tool": {
+      "server_id": "@mzdz/calc-mcp-server",
+      "server_name": "计算器(Calc MCP)",
+      "tool_name": "add"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.448054952396705
+  },
+  {
+    "request": "Can you help me figure out how to analyze the relationship between the number of hours of sleep and feeling refreshed in the morning?",
+    "target_tool": {
+      "server_id": "@waldzellai/clear-thought",
+      "server_name": "Clear Thought 1.5",
+      "tool_name": "clear_thought"
+    },
+    "bucket": "Hard",
+    "ic_score": 11.140087347866361
+  },
+  {
+    "request": "I’m working on a RN Skia swipe-to-reveal list item—could you outline a performant approach with steps, techniques, and sample code?",
+    "target_tool": {
+      "server_id": "@mahecode/mcp-react-native-skia",
+      "server_name": "React Native Skia Animation Thinking Tool",
+      "tool_name": "skiaanimationthinking"
+    },
+    "bucket": "Hard",
+    "ic_score": 13.098939323415319
+  },
+  {
+    "request": "Can you help me design a study to test the relationship between time spent playing video games and time spent reading books?",
+    "target_tool": {
+      "server_id": "@waldzellai/scientific-method",
+      "server_name": "Scientific Method Server",
+      "tool_name": "scientificMethod"
+    },
+    "bucket": "Hard",
+    "ic_score": 35.97867703483718
+  },
+  {
+    "request": "Could you use Atom of Thoughts to break down planning a team-building event—premises, reasoning, hypotheses, verification, and a conclusion?",
+    "target_tool": {
+      "server_id": "@kbsooo/mcp_atom_of_thoughts",
+      "server_name": "Atom of Thoughts",
+      "tool_name": "AoT"
+    },
+    "bucket": "Hard",
+    "ic_score": 14.74225419463555
+  },
+  {
+    "request": "Can you fetch https://www.weather.gov/ and give me the content in markdown?",
+    "target_tool": {
+      "server_id": "@jiankaitian/servers",
+      "server_name": "Fetch Server",
+      "tool_name": "fetch"
+    },
+    "bucket": "Hard",
+    "ic_score": 14.552670480717287
+  },
+  {
+    "request": "Could you find up-to-date docs and examples for 'pandas DataFrame filtering'—ideally some real-world cleaning, transform, and viz cases?",
+    "target_tool": {
+      "server_id": "exa",
+      "server_name": "Exa Search",
+      "tool_name": "get_code_context_exa"
+    },
+    "bucket": "Hard",
+    "ic_score": 16.01101254308479
+  },
+  {
+    "request": "Could you search for images of 'golden retriever' (large only, 10 results, relevance sort)?",
+    "target_tool": {
+      "server_id": "@jikime/py-mcp-naver-search",
+      "server_name": "Naver Search",
+      "tool_name": "search_image"
+    },
+    "bucket": "Hard",
+    "ic_score": 9.193012476486814
+  },
+  {
+    "request": "Using Desktop Commander: can you send print('hello from DC') to the Python REPL running as PID 1234?",
+    "target_tool": {
+      "server_id": "@GigaChatTester/desktopcommandermcp",
+      "server_name": "Desktop Commander",
+      "tool_name": "interact_with_process"
+    },
+    "bucket": "Hard",
+    "ic_score": 11.360127427729669
+  },
+  {
+    "request": "Can you help me prioritize tasks for the next week and figure out which ones can be done with the tools we have?",
+    "target_tool": {
+      "server_id": "@TanukiMCP/taskmaster",
+      "server_name": "Taskmaster",
+      "tool_name": "taskmaster"
+    },
+    "bucket": "Hard",
+    "ic_score": 42.10699585690871
+  },
+  {
+    "request": "Can you get me the most relevant papers on reinforcement learning that were recently posted to arXiv, starting from the past year, with maybe 20 results at most, in descending order of relevance, so I can check them out?",
+    "target_tool": {
+      "server_id": "@hamid-vakilzadeh/mcpsemanticscholar",
+      "server_name": "AI Research Assistant",
+      "tool_name": "search-arxiv"
+    },
+    "bucket": "Hard",
+    "ic_score": 15.226702014790384
+  },
+  {
+    "request": "Mind generating a 1024x1024 photorealistic image of a serene beach at sunset with palm trees?",
+    "target_tool": {
+      "server_id": "@PawNzZi/image-server",
+      "server_name": "text2image",
+      "tool_name": "image_generation"
+    },
+    "bucket": "Hard",
+    "ic_score": 8.11254247590989
+  },
+  {
+    "request": "Could you analyze and rate this prompt’s quality: 'Write a concise email to schedule a team meeting next Tuesday at 10am.'",
+    "target_tool": {
+      "server_id": "@su-record/hi-ai",
+      "server_name": "Hi-AI",
+      "tool_name": "analyze_prompt"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.625470000576925
+  },
+  {
+    "request": "Can you check the USDT (ERC20) balance for 0xF977814e90dA44bFA03b6295A0616a897441aceC on Ethereum mainnet?",
+    "target_tool": {
+      "server_id": "@blockscout/mcp-server",
+      "server_name": "Blockscout MCP Server",
+      "tool_name": "read_contract"
+    },
+    "bucket": "Hard",
+    "ic_score": 13.326271237954945
+  },
+  {
+    "request": "Can you plan a quick 5-day trip with my friend to a nearby city?",
+    "target_tool": {
+      "server_id": "@smithery-ai/server-sequential-thinking",
+      "server_name": "Sequential Thinking",
+      "tool_name": "sequentialthinking"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.900149143730406
+  },
+  {
+    "request": "Can you help me understand the new compound's properties by drawing an analogy with water's structure and behavior, considering both atomic composition and chemical bonding, so I can make some educated guesses about its performance in various conditions and weigh the usefulness of this analogy?",
+    "target_tool": {
+      "server_id": "@waldzellai/analogical-reasoning",
+      "server_name": "Analogical Reasoning Server",
+      "tool_name": "analogicalReasoning"
+    },
+    "bucket": "Hard",
+    "ic_score": 37.232595586794844
+  },
+  {
+    "request": "Can you give me a list of the top 5 most recent internet-connected devices running Apache HTTP Server in the US, along with their geographic distribution, services, and any known vulnerabilities, within the next 30 days?",
+    "target_tool": {
+      "server_id": "@burtthecoder/mcp-shodan",
+      "server_name": "Shodan Server",
+      "tool_name": "shodan_search"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.178012476486815
+  },
+  {
+    "request": "Could you run a clean on '/Users/iosdev/Projects/MyApp.xcodeproj' (scheme 'MyApp')?",
+    "target_tool": {
+      "server_id": "@cameroncooke/XcodeBuildMCP",
+      "server_name": "XcodeBuild MCP Server",
+      "tool_name": "clean_proj"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.625470000576925
+  },
+  {
+    "request": "Please search Semantic Scholar for authors related to 'artificial intelligence' and return up to 50.",
+    "target_tool": {
+      "server_id": "@alperenkocyigit/semantic-scholar-graph-api",
+      "server_name": "Semantic Scholar Academic Research MCP",
+      "tool_name": "search_semantic_scholar_authors"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.81424123853187
+  },
+  {
+    "request": "Can you show me the balance of ad account act_1234567890, and its name, by tomorrow?",
+    "target_tool": {
+      "server_id": "@gomarble-ai/facebook-ads-mcp-server",
+      "server_name": "Facebook Ads Server",
+      "tool_name": "get_details_of_ad_account"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.607970000576925
+  },
+  {
+    "request": "Can you rename the 'Marketing Tasks' folder to 'Marketing Archive' (leave statuses as-is)?",
+    "target_tool": {
+      "server_id": "@aukik/clickup-mcp-server",
+      "server_name": "ClickUp Task Integration Server",
+      "tool_name": "update_folder"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.390883937646083
+  },
+  {
+    "request": "Can you plan a 7-day trip for me somewhere with a pleasant, not too hot climate, and find a hotel that's right on or close to the beach, ideally within walking distance?",
+    "target_tool": {
+      "server_id": "@marco280690/mcp",
+      "server_name": "Model Context Protocol Server",
+      "tool_name": "sequentialthinking"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.900149143730406
+  },
+  {
+    "request": "Can you fetch https://twitter.com/ and give me the page in markdown?",
+    "target_tool": {
+      "server_id": "@iamadk/fetch",
+      "server_name": "Fetch Server",
+      "tool_name": "fetch"
+    },
+    "bucket": "Hard",
+    "ic_score": 14.552670480717287
+  },
+  {
+    "request": "And if possible, could you also include the trading volume for each day?",
+    "target_tool": {
+      "server_id": "@guangxiangdebizi/finance-mcp",
+      "server_name": "FinanceMCP Server",
+      "tool_name": "stock_data"
+    },
+    "bucket": "Hard",
+    "ic_score": 7.972970000576925
+  },
+  {
+    "request": "Hey, I'm looking for this week's Watchtower study articles, could you get the latest ones from JW.org?",
+    "target_tool": {
+      "server_id": "@advenimus/jw-mcp",
+      "server_name": "JW.org Content Tools",
+      "tool_name": "getWatchtowerLinks"
+    },
+    "bucket": "Hard",
+    "ic_score": 5.75004247590989
+  },
+  {
+    "request": "Could you search PubMed for title/abstract keywords ['Parkinson's disease', 'recruiting'] and give me up to 10 results?",
+    "target_tool": {
+      "server_id": "@gradusnikov/pubmed-search-mcp-server",
+      "server_name": "PubMedSearch",
+      "tool_name": "search_pubmed"
+    },
+    "bucket": "Hard",
+    "ic_score": 8.493771237954945
+  },
+  {
+    "request": "In the document, please delete characters 5-15 from paragraph 0.",
+    "target_tool": {
+      "server_id": "@MeterLong/mcp-doc",
+      "server_name": "Docx Document Processing Service",
+      "tool_name": "delete_text"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.276313713864836
+  },
+  {
+    "request": "Can you show me the Velt feature usage analytics for the past month, breaking down the counts of create, read, update, and delete operations for each feature?",
+    "target_tool": {
+      "server_id": "@velt-js/velt-analytics-mcp",
+      "server_name": "Velt Analytics Server",
+      "tool_name": "get_feature_analytics_count"
+    },
+    "bucket": "Hard",
+    "ic_score": 10.084743537416841
+  }
+]
