@@ -1,42 +1,64 @@
 
-## 0) Env
-Create `.env`:
+## 0) Environment
+- Python 3.11+ and `pip` installed.
+- Optional providers:
+  - Ollama (local): set `OLLAMA_HOST` (e.g. `http://localhost:11434`) and ensure the model is available (`ollama pull qwen2.5:7b-instruct`).
+  - Fireworks: set `FIREWORKS_API_KEY`.
+  - Gemini: set `GEMINI_API_KEY`.
+- You can keep these in a local `.env` for your shell.
 
+Example `.env`:
 
 GEMINI_API_KEY=...
 FIREWORKS_API_KEY=...
-OLLAMA_BASE=http://localhost:11434
+OLLAMA_HOST=http://localhost:11434
 
 
-## 1) Start server
+## 1) Start the server
+Serves the tool catalogue and applies optional schema wrappers.
+
 ```bash
-python3 server/app.py --port 3001 --tools tools.jsonl \
-  --default-latency 100 --wrap none  # wrap=none|flat|hard
+python3 server/app.py --port 3001 --tools tools.jsonl --wrap none --default-latency 0
+# wrap: none | flat | hard
+```
 
-2) Generate tasks
+## 2) Generate tasks
+Use the task generator to emit both generic and fuzzy suites. The configs in `configs/` point to `tests/fuzzy_tasks.jsonl` by default.
+
+```bash
+make tasks
+# or
 PYTHONPATH=. python3 bench/taskgen.py --tools tools.jsonl \
-  --out tests/fuzzy_tasks.jsonl --tiers realistic --seed 42
+  --generic-out tests/generic_tasks.jsonl --fuzzy-out tests/fuzzy_tasks.jsonl \
+  --tiers realistic --seed 42
+```
 
-3) Single prompt (Ollama)
+## 3) Single prompt (optional)
+Run one prompt against a live server to sanity check your setup.
+
+```bash
 PYTHONPATH=. python3 bench/agent.py --provider ollama --model qwen2.5:7b-instruct \
   --server http://localhost:3001 --ollama http://localhost:11434 \
   --prompt "Add 2 and 3." --max-steps 3 --retry 1
+```
 
-4) End-to-end (local SLM)
+## 4) End-to-end run
+Executes the full agent loop across a task suite and writes `results.jsonl` + `summary.json` under `runs/`.
+
+```bash
 PYTHONPATH=. python3 bench/run_e2e.py --config configs/local_qwen.yaml
+```
 
-5) Benchmark grid (SLM vs LLM; conditions)
+## 5) Grid benchmark
+Sweeps multiple models/conditions defined in `configs/ablation.yaml`, produces per-run summaries and a `bench_summary.json`.
+
+```bash
 PYTHONPATH=. python3 bench/run_bench.py --config configs/ablation.yaml
+```
 
-6) Reports
+## 6) Reports
+Aggregates summaries into a CSV and Markdown table under `runs/report/`.
+
+```bash
 PYTHONPATH=. python3 bench/report.py --runs runs/ --out runs/report
-
-Smoke test (from README examples)
-
-Server: python3 server/app.py --port 3001 --tools tools.jsonl
-
-Agent single run (Ollama):
-
-PYTHONPATH=. python3 bench/agent.py --provider ollama --model qwen2.5:7b-instruct \
-  --prompt "Add 2 and 3." --server http://localhost:3001 \
-  --ollama http://localhost:11434 --max-steps 3 --retry 1
+```
